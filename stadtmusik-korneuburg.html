@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stadtmusik Korneuburg – Uniformerfassung</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a3a5c;
+    --navy-dark: #0f2540;
+    --gold: #c8a84b;
+    --gold-light: #f0e4c0;
+    --cream: #faf8f3;
+    --white: #ffffff;
+    --text: #1c1c1c;
+    --text-muted: #6b6b6b;
+    --text-light: #9a9a9a;
+    --border: rgba(0,0,0,0.1);
+    --border-focus: #1a3a5c;
+    --success: #1a6b3c;
+    --success-bg: #eaf5ef;
+    --error: #c0392b;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* Header */
+  .header {
+    background: var(--navy);
+    padding: 2rem 1rem 1.8rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: -40px;
+    width: 180px; height: 180px;
+    border: 1px solid rgba(200,168,75,0.15);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: -30px;
+    width: 220px; height: 220px;
+    border: 1px solid rgba(200,168,75,0.1);
+    border-radius: 50%;
+  }
+  .header-inner { position: relative; z-index: 1; }
+  .logo {
+    width: 60px; height: 60px;
+    background: rgba(200,168,75,0.15);
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 14px;
+  }
+  .logo svg { width: 30px; height: 30px; fill: var(--gold); }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--white);
+    letter-spacing: 0.02em;
+  }
+  .header p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    margin-top: 5px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+  }
+  .gold-line {
+    width: 40px; height: 2px;
+    background: var(--gold);
+    margin: 12px auto 0;
+    border-radius: 2px;
+  }
+
+  /* Main */
+  .main { max-width: 560px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+  /* Sections */
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 1.8rem 0 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Fields */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 13px; color: var(--text-muted); font-weight: 400; }
+  .optional { font-size: 11px; color: var(--text-light); }
+
+  input[type=text], input[type=tel], input[type=email], select, textarea {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: 'Source Sans 3', sans-serif;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(26,58,92,0.08);
+  }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+  /* Uniform cards */
+  .uniform-cards { display: flex; flex-direction: column; gap: 10px; }
+  .u-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .u-card.active {
+    border-color: var(--navy);
+    box-shadow: 0 2px 12px rgba(26,58,92,0.08);
+  }
+  .u-card-header {
+    display: flex; align-items: center;
+    padding: 14px 16px;
+    cursor: pointer;
+    gap: 12px;
+    user-select: none;
+  }
+  .u-icon {
+    width: 40px; height: 40px;
+    background: var(--cream);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .u-card.active .u-icon { background: var(--gold-light); }
+  .u-name { font-size: 16px; font-weight: 500; flex: 1; }
+  .u-hint { font-size: 12px; color: var(--text-light); margin-top: 1px; }
+
+  /* Toggle switch */
+  .toggle-wrap { flex-shrink: 0; }
+  .toggle {
+    width: 44px; height: 26px;
+    background: #d0d0d0;
+    border-radius: 13px;
+    position: relative;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: block;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle.on { background: var(--navy); }
+  .toggle.on::after { transform: translateX(18px); }
+
+  .u-size {
+    padding: 0 16px 14px;
+    display: none;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    margin-top: 0;
+    padding-top: 13px;
+  }
+  .u-size.show { display: block; }
+  .u-size label { font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .u-size input { max-width: 200px; }
+
+  /* Submit button */
+  .submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'Source Sans 3', sans-serif;
+    cursor: pointer;
+    margin-top: 1.8rem;
+    letter-spacing: 0.02em;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .submit-btn:hover { background: var(--navy-dark); box-shadow: 0 4px 16px rgba(26,58,92,0.25); }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { background: #aaa; cursor: not-allowed; box-shadow: none; }
+  .submit-btn .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Success */
+  .success-view { display: none; text-align: center; padding: 2.5rem 1rem; }
+  .success-circle {
+    width: 72px; height: 72px;
+    background: var(--success-bg);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 32px;
+  }
+  .success-view h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--navy);
+  }
+  .success-view p { font-size: 15px; color: var(--text-muted); line-height: 1.6; }
+  .reset-btn {
+    margin-top: 20px;
+    padding: 10px 24px;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'Source Sans 3', sans-serif;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .reset-btn:hover { border-color: var(--navy); color: var(--navy); }
+
+  /* Error banner */
+  .err-banner {
+    display: none;
+    background: #fdf2f2;
+    border: 1px solid #f5c6c6;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--error);
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+
+  /* === ADMIN PANEL === */
+  .admin-trigger {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 7px 16px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-family: 'Source Sans 3', sans-serif;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.15s;
+    z-index: 50;
+  }
+  .admin-trigger:hover { border-color: var(--navy); color: var(--navy); }
+
+  .overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .overlay.open { display: flex; }
+
+  @media (min-width: 600px) {
+    .overlay { align-items: center; padding: 20px; }
+    .panel { border-radius: var(--radius) !important; max-height: 90vh !important; }
+  }
+
+  .panel {
+    background: white;
+    width: 100%;
+    max-width: 900px;
+    max-height: 85vh;
+    border-radius: var(--radius) var(--radius) 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .panel-header h2 { font-size: 16px; font-weight: 500; flex: 1; }
+  .close-btn {
+    background: none; border: none;
+    font-size: 22px; cursor: pointer;
+    color: var(--text-muted);
+    line-height: 1;
+    padding: 0;
+  }
+  .panel-body { padding: 20px; overflow-y: auto; flex: 1; }
+
+  /* Login */
+  .login-box { max-width: 320px; margin: 0 auto; padding: 1rem 0; }
+  .login-box label { font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 6px; }
+  .pw-err { font-size: 13px; color: var(--error); margin-top: 8px; display: none; }
+  .login-btn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 11px;
+    background: var(--navy);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: 'Source Sans 3', sans-serif;
+    cursor: pointer;
+  }
+  .login-btn:hover { background: var(--navy-dark); }
+
+  /* Data table */
+  .data-toolbar {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .count-pill {
+    background: var(--gold-light);
+    color: #7a5c10;
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .action-btn {
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: 'Source Sans 3', sans-serif;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--text);
+    transition: all 0.15s;
+  }
+  .action-btn:hover { border-color: var(--navy); color: var(--navy); }
+  .action-btn.primary { background: var(--navy); color: white; border-color: var(--navy); }
+  .action-btn.primary:hover { background: var(--navy-dark); }
+  .action-btn.danger { color: var(--error); border-color: #f5c6c6; margin-left: auto; }
+  .action-btn.danger:hover { background: #fdf2f2; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
+  th {
+    background: #f5f4f0;
+    padding: 9px 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  td { padding: 9px 10px; border-bottom: 1px solid rgba(0,0,0,0.05); vertical-align: top; font-size: 13px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #faf9f6; }
+
+  .badge-yes { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; background: #eaf5ef; color: #1a6b3c; }
+  .badge-no  { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; background: #f2f2f2; color: #999; }
+
+  .no-data { text-align: center; padding: 2.5rem; color: var(--text-light); font-size: 14px; }
+
+  /* Config notice */
+  .config-notice {
+    background: #fffbeb;
+    border: 1px solid #f0d070;
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #7a5c10;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    display: none;
+  }
+  .config-notice strong { display: block; margin-bottom: 4px; font-size: 14px; }
+  .config-notice code { background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 3px; font-family: monospace; font-size: 12px; }
+
+  @media (max-width: 480px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .header h1 { font-size: 19px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     KONFIGURATION – NUR HIER ANPASSEN
+     Anleitung unten in der HTML-Datei
+════════════════════════════════════════════════ -->
+<script>
+  // 1. Google Apps Script Web App URL hier eintragen (Anleitung weiter unten):
+  const SCRIPT_URL = '';
+
+  // 2. Admin-Passwort (bitte ändern!):
+  const ADMIN_PW = 'Korneuburg2025';
+
+  // 3. Lokaler Speicher als Fallback wenn kein Script URL eingetragen:
+  const USE_LOCAL_FALLBACK = true;
+</script>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v10.55A4 4 0 1 0 11 17V7h4V3H9z"/></svg>
+    </div>
+    <h1>Stadtmusik Korneuburg</h1>
+    <p>Erfassung der Vereinsuniformen</p>
+    <div class="gold-line"></div>
+  </div>
+</div>
+
+<!-- MAIN FORM -->
+<div class="main">
+  <div id="config-notice" class="config-notice">
+    <strong>⚙️ Einrichtung erforderlich</strong>
+    Die Daten werden derzeit nur lokal im Browser gespeichert. Für dauerhafte Speicherung in Google Sheets bitte die <code>SCRIPT_URL</code> in der HTML-Datei eintragen. Anleitung weiter unten im Quellcode.
+  </div>
+
+  <div id="form-view">
+    <p class="section-label">Persönliche Daten</p>
+    <div class="grid-2">
+      <div class="field"><label>Vorname *</label><input type="text" id="vorname" placeholder="z.B. Maria" autocomplete="given-name"></div>
+      <div class="field"><label>Nachname *</label><input type="text" id="nachname" placeholder="z.B. Mustermann" autocomplete="family-name"></div>
+    </div>
+    <div class="grid-2" style="margin-top:10px;">
+      <div class="field"><label>Telefon *</label><input type="tel" id="telefon" placeholder="+43 664 …" autocomplete="tel"></div>
+      <div class="field">
+        <label>Instrument *</label>
+        <select id="instrument">
+          <option value="">Bitte wählen …</option>
+          <optgroup label="Blechblasinstrumente">
+            <option>Trompete</option>
+            <option>Flügelhorn</option>
+            <option>Tenorhorn</option>
+            <option>Bariton</option>
+            <option>Posaune</option>
+            <option>Tuba</option>
+            <option>Euphonium</option>
+          </optgroup>
+          <optgroup label="Holzblasinstrumente">
+            <option>Klarinette</option>
+            <option>Saxophon</option>
+            <option>Querflöte</option>
+            <option>Oboe</option>
+            <option>Fagott</option>
+          </optgroup>
+          <optgroup label="Schlagwerk &amp; Sonstige">
+            <option>Schlagzeug</option>
+            <option>Pauken</option>
+            <option>Sonstige</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:10px;" class="field">
+      <label>E-Mail-Adresse <span class="optional">(optional)</span></label>
+      <input type="email" id="email" placeholder="name@beispiel.at" autocomplete="email">
+    </div>
+
+    <p class="section-label">Uniformteile</p>
+    <div class="uniform-cards">
+
+      <div class="u-card" id="card-sakko">
+        <div class="u-card-header" onclick="toggleUniform('sakko')">
+          <div class="u-icon">🧥</div>
+          <div>
+            <div class="u-name">Sakko / Jacke</div>
+            <div class="u-hint">Tippe zum Markieren</div>
+          </div>
+          <div class="toggle-wrap"><button class="toggle" id="tog-sakko" aria-label="Sakko vorhanden"></button></div>
+        </div>
+        <div class="u-size" id="size-sakko">
+          <label>Konfektionsgröße</label>
+          <input type="text" id="sz-sakko" placeholder="z.B. 50, 52, M, 48/50 …">
+        </div>
+      </div>
+
+      <div class="u-card" id="card-gilet">
+        <div class="u-card-header" onclick="toggleUniform('gilet')">
+          <div class="u-icon">🦺</div>
+          <div>
+            <div class="u-name">Gilet</div>
+            <div class="u-hint">Tippe zum Markieren</div>
+          </div>
+          <div class="toggle-wrap"><button class="toggle" id="tog-gilet" aria-label="Gilet vorhanden"></button></div>
+        </div>
+        <div class="u-size" id="size-gilet">
+          <label>Konfektionsgröße</label>
+          <input type="text" id="sz-gilet" placeholder="z.B. 50, 52, M, 48/50 …">
+        </div>
+      </div>
+
+      <div class="u-card" id="card-hut">
+        <div class="u-card-header" onclick="toggleUniform('hut')">
+          <div class="u-icon">🎩</div>
+          <div>
+            <div class="u-name">Hut</div>
+            <div class="u-hint">Tippe zum Markieren</div>
+          </div>
+          <div class="toggle-wrap"><button class="toggle" id="tog-hut" aria-label="Hut vorhanden"></button></div>
+        </div>
+        <div class="u-size" id="size-hut">
+          <label>Hutgröße</label>
+          <input type="text" id="sz-hut" placeholder="z.B. 57, 58, 59, S/M …">
+        </div>
+      </div>
+
+    </div>
+
+    <p class="section-label">Anmerkungen <span class="optional">(optional)</span></p>
+    <textarea id="anmerkungen" placeholder="z.B. Sakko passt nicht mehr, Hut ist beschädigt, benötige neue Größe …"></textarea>
+
+    <button class="submit-btn" id="submit-btn" onclick="submitForm()">
+      <span class="spinner" id="spinner"></span>
+      <span id="btn-text">Daten absenden</span>
+    </button>
+    <div class="err-banner" id="err-banner"></div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-view" id="success-view">
+    <div class="success-circle">✓</div>
+    <h2>Vielen Dank!</h2>
+    <p>Deine Angaben wurden erfolgreich gespeichert.<br>Der Vorstand wird sich bei Bedarf bei dir melden.</p>
+    <button class="reset-btn" onclick="resetForm()">Weiteres Mitglied erfassen</button>
+  </div>
+</div>
+
+<!-- ADMIN BUTTON -->
+<button class="admin-trigger" onclick="openAdmin()">🔒 Admin</button>
+
+<!-- ADMIN OVERLAY -->
+<div class="overlay" id="admin-overlay">
+  <div class="panel">
+    <div class="panel-header">
+      <h2 id="panel-title">Admin-Bereich</h2>
+      <button class="close-btn" onclick="closeAdmin()">×</button>
+    </div>
+    <div class="panel-body">
+
+      <!-- LOGIN -->
+      <div id="login-panel">
+        <div class="login-box">
+          <label>Passwort</label>
+          <input type="password" id="pw-input" placeholder="Passwort eingeben" onkeydown="if(event.key==='Enter')checkLogin()">
+          <p class="pw-err" id="pw-err">Falsches Passwort. Bitte erneut versuchen.</p>
+          <button class="login-btn" onclick="checkLogin()">Einloggen</button>
+        </div>
+      </div>
+
+      <!-- DATA TABLE -->
+      <div id="data-panel" style="display:none;">
+        <div class="data-toolbar">
+          <span class="count-pill" id="entry-count">0 Einträge</span>
+          <button class="action-btn primary" onclick="exportCSV()">⬇ CSV exportieren</button>
+          <button class="action-btn" onclick="refreshTable()">↻ Aktualisieren</button>
+          <button class="action-btn danger" onclick="confirmClear()">Daten löschen</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nachname</th>
+                <th>Vorname</th>
+                <th>Instrument</th>
+                <th>Telefon</th>
+                <th>E-Mail</th>
+                <th>Sakko</th>
+                <th>Sakko-Gr.</th>
+                <th>Gilet</th>
+                <th>Gilet-Gr.</th>
+                <th>Hut</th>
+                <th>Hut-Gr.</th>
+                <th>Anmerkungen</th>
+                <th>Erfasst</th>
+              </tr>
+            </thead>
+            <tbody id="data-tbody"></tbody>
+          </table>
+          <p class="no-data" id="no-data" style="display:none;">Noch keine Einträge vorhanden.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────
+const uniformState = { sakko: false, gilet: false, hut: false };
+
+function toggleUniform(item) {
+  uniformState[item] = !uniformState[item];
+  const tog = document.getElementById('tog-' + item);
+  const sizeEl = document.getElementById('size-' + item);
+  const card = document.getElementById('card-' + item);
+  tog.classList.toggle('on', uniformState[item]);
+  sizeEl.classList.toggle('show', uniformState[item]);
+  card.classList.toggle('active', uniformState[item]);
+  if (!uniformState[item]) document.getElementById('sz-' + item).value = '';
+}
+
+// ── Local Storage helpers ──────────────────────────────
+const LS_KEY = 'smk_uniforms_v1';
+function lsLoad() { try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch(e) { return []; } }
+function lsSave(data) { localStorage.setItem(LS_KEY, JSON.stringify(data)); }
+
+// ── Submit ─────────────────────────────────────────────
+async function submitForm() {
+  const vorname = document.getElementById('vorname').value.trim();
+  const nachname = document.getElementById('nachname').value.trim();
+  const telefon = document.getElementById('telefon').value.trim();
+  const instrument = document.getElementById('instrument').value;
+  const errBanner = document.getElementById('err-banner');
+  errBanner.style.display = 'none';
+
+  if (!vorname || !nachname || !telefon || !instrument) {
+    errBanner.textContent = 'Bitte alle Pflichtfelder ausfüllen (mit * markiert).';
+    errBanner.style.display = 'block';
+    return;
+  }
+
+  const entry = {
+    ts: new Date().toLocaleString('de-AT'),
+    vorname, nachname, telefon, instrument,
+    email: document.getElementById('email').value.trim(),
+    sakko: uniformState.sakko ? 'Ja' : 'Nein',
+    sakko_sz: uniformState.sakko ? document.getElementById('sz-sakko').value.trim() : '',
+    gilet: uniformState.gilet ? 'Ja' : 'Nein',
+    gilet_sz: uniformState.gilet ? document.getElementById('sz-gilet').value.trim() : '',
+    hut: uniformState.hut ? 'Ja' : 'Nein',
+    hut_sz: uniformState.hut ? document.getElementById('sz-hut').value.trim() : '',
+    anmerkungen: document.getElementById('anmerkungen').value.trim()
+  };
+
+  const btn = document.getElementById('submit-btn');
+  const spinner = document.getElementById('spinner');
+  const btnText = document.getElementById('btn-text');
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  btnText.textContent = 'Wird gespeichert …';
+
+  let saved = false;
+
+  // Try Google Sheets via Apps Script
+  if (SCRIPT_URL && SCRIPT_URL.trim() !== '') {
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      });
+      saved = true;
+    } catch(e) {
+      console.warn('Google Sheets Fehler:', e);
+    }
+  }
+
+  // Always also save locally as backup
+  if (USE_LOCAL_FALLBACK) {
+    const data = lsLoad();
+    data.push(entry);
+    lsSave(data);
+    saved = true;
+  }
+
+  btn.disabled = false;
+  spinner.style.display = 'none';
+  btnText.textContent = 'Daten absenden';
+
+  if (saved) {
+    document.getElementById('form-view').style.display = 'none';
+    document.getElementById('success-view').style.display = 'block';
+  } else {
+    errBanner.textContent = 'Fehler beim Speichern. Bitte Seite neu laden und erneut versuchen.';
+    errBanner.style.display = 'block';
+  }
+}
+
+function resetForm() {
+  ['vorname','nachname','telefon','email','anmerkungen'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('instrument').value = '';
+  ['sakko','gilet','hut'].forEach(i => { if(uniformState[i]) toggleUniform(i); });
+  document.getElementById('form-view').style.display = 'block';
+  document.getElementById('success-view').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+// ── Admin ──────────────────────────────────────────────
+let adminLoggedIn = false;
+
+function openAdmin() { document.getElementById('admin-overlay').classList.add('open'); }
+function closeAdmin() {
+  document.getElementById('admin-overlay').classList.remove('open');
+  if (!adminLoggedIn) {
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-err').style.display = 'none';
+  }
+}
+
+function checkLogin() {
+  if (document.getElementById('pw-input').value === ADMIN_PW) {
+    adminLoggedIn = true;
+    document.getElementById('login-panel').style.display = 'none';
+    document.getElementById('data-panel').style.display = 'block';
+    document.getElementById('panel-title').textContent = 'Mitgliederliste';
+    renderTable();
+  } else {
+    document.getElementById('pw-err').style.display = 'block';
+  }
+}
+
+function renderTable() {
+  const data = lsLoad();
+  const tbody = document.getElementById('data-tbody');
+  const noData = document.getElementById('no-data');
+  document.getElementById('entry-count').textContent = data.length + (data.length === 1 ? ' Eintrag' : ' Einträge');
+  if (data.length === 0) { tbody.innerHTML = ''; noData.style.display = 'block'; return; }
+  noData.style.display = 'none';
+  tbody.innerHTML = data.map(d => `
+    <tr>
+      <td><strong>${esc(d.nachname)}</strong></td>
+      <td>${esc(d.vorname)}</td>
+      <td>${esc(d.instrument)}</td>
+      <td>${esc(d.telefon)}</td>
+      <td>${esc(d.email)||'—'}</td>
+      <td><span class="badge-${d.sakko==='Ja'?'yes':'no'}">${d.sakko}</span></td>
+      <td>${esc(d.sakko_sz)||'—'}</td>
+      <td><span class="badge-${d.gilet==='Ja'?'yes':'no'}">${d.gilet}</span></td>
+      <td>${esc(d.gilet_sz)||'—'}</td>
+      <td><span class="badge-${d.hut==='Ja'?'yes':'no'}">${d.hut}</span></td>
+      <td>${esc(d.hut_sz)||'—'}</td>
+      <td style="max-width:140px;word-break:break-word;">${esc(d.anmerkungen)||'—'}</td>
+      <td style="white-space:nowrap;color:#999;">${esc(d.ts)}</td>
+    </tr>`).join('');
+}
+
+function refreshTable() { renderTable(); }
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function exportCSV() {
+  const data = lsLoad();
+  if (!data.length) { alert('Keine Daten vorhanden.'); return; }
+  const headers = ['Nachname','Vorname','Instrument','Telefon','E-Mail','Sakko','Sakko-Größe','Gilet','Gilet-Größe','Hut','Hut-Größe','Anmerkungen','Erfasst am'];
+  const rows = data.map(d => [
+    d.nachname, d.vorname, d.instrument, d.telefon, d.email||'',
+    d.sakko, d.sakko_sz||'', d.gilet, d.gilet_sz||'', d.hut, d.hut_sz||'',
+    d.anmerkungen||'', d.ts
+  ].map(v => '"' + String(v).replace(/"/g,'""') + '"').join(';'));
+  const csv = '\uFEFF' + [headers.join(';'), ...rows].join('\r\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'Stadtmusik_Korneuburg_Uniformen_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+function confirmClear() {
+  if (confirm('Alle lokal gespeicherten Daten unwiderruflich löschen?\n\nHinweis: Daten in Google Sheets bleiben erhalten.')) {
+    localStorage.removeItem(LS_KEY);
+    renderTable();
+  }
+}
+
+// ── Init ───────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  if (!SCRIPT_URL || SCRIPT_URL.trim() === '') {
+    document.getElementById('config-notice').style.display = 'block';
+  }
+});
+</script>
+
+<!--
+════════════════════════════════════════════════════════════
+  ANLEITUNG: Google Sheets Anbindung (5 Minuten)
+════════════════════════════════════════════════════════════
+
+1. Gehe zu: https://sheets.google.com
+   → Erstelle ein neues Spreadsheet mit dem Namen "Stadtmusik Korneuburg Uniformen"
+
+2. Gehe zu: Erweiterungen → Apps Script
+
+3. Füge folgenden Code ein (alten Code löschen):
+
+------- CODE ANFANG -------
+function doPost(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Nachname','Vorname','Instrument','Telefon','E-Mail',
+      'Sakko','Sakko-Größe','Gilet','Gilet-Größe','Hut','Hut-Größe',
+      'Anmerkungen','Erfasst am']);
+  }
+  
+  const data = JSON.parse(e.postData.contents);
+  sheet.appendRow([
+    data.nachname, data.vorname, data.instrument, data.telefon, data.email||'',
+    data.sakko, data.sakko_sz||'', data.gilet, data.gilet_sz||'',
+    data.hut, data.hut_sz||'', data.anmerkungen||'', data.ts
+  ]);
+  
+  return ContentService.createTextOutput(JSON.stringify({status:'ok'}))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+------- CODE ENDE -------
+
+4. Klicke auf "Bereitstellen" → "Neue Bereitstellung"
+   → Typ: Web-App
+   → Ausführen als: Ich (deine Google-Adresse)
+   → Zugriff: Jeder (anonym)
+   → Klicke "Bereitstellen" und kopiere die URL
+
+5. Füge die URL in dieser HTML-Datei ganz oben bei
+   const SCRIPT_URL = 'HIER DEINE URL';
+   ein, speichere und lade die Datei neu hoch.
+
+════════════════════════════════════════════════════════════
+  ANLEITUNG: Auf Netlify hosten (3 Minuten, kostenlos)
+════════════════════════════════════════════════════════════
+
+1. Gehe zu: https://netlify.com → kostenlos registrieren
+2. Auf der Startseite: HTML-Datei einfach per Drag & Drop
+   in das Drop-Feld ziehen
+3. Netlify gibt dir sofort eine URL wie:
+   https://dein-name.netlify.app
+4. Diese URL per WhatsApp an die Mitglieder senden!
+
+Eigene URL möglich (z.B. stadtmusik-korneuburg.netlify.app):
+→ Site settings → Change site name
+
+════════════════════════════════════════════════════════════
+-->
+</body>
+</html>
